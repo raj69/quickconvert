@@ -1,103 +1,121 @@
-import Image from "next/image";
+// app/page.tsx
+import { Metadata } from 'next'
+import dynamic from 'next/dynamic'
+import { Suspense } from 'react'
 
-export default function Home() {
+// Regular dynamic import for UnitConverter (works in Server Components)
+const UnitConverter = dynamic(() => import('@/components/UnitConverter'), {
+  loading: () => <div className="h-96 bg-gray-100 animate-pulse rounded-lg" />,
+})
+
+// Import the Client Component wrapper instead
+const ClientVoiceInput = dynamic(() => import('@/components/ClientVoiceInput'), {
+  loading: () => <div className="h-32 bg-gray-100 animate-pulse rounded" />,
+})
+
+export const metadata: Metadata = {
+  title: 'Unit Converter - Convert Length, Weight, Temperature & More | QuickConvert',
+  description: 'Free online unit converter with AI suggestions. Convert between metric and imperial units instantly. Length, weight, temperature, volume, and 8+ categories.',
+  alternates: {
+    canonical: 'https://quickconvert.app',
+  },
+}
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  name: 'QuickConvert Unit Converter',
+  description: 'Lightning fast unit converter with AI suggestions and voice input',
+  url: 'https://quickconvert.app',
+  applicationCategory: 'Utility',
+  operatingSystem: 'Any',
+  browserRequirements: 'Requires JavaScript',
+  softwareVersion: '2.0',
+  offers: {
+    '@type': 'Offer',
+    price: '0',
+    priceCurrency: 'USD',
+  },
+  featureList: [
+    'AI-powered unit suggestions',
+    'Voice input and audio results',
+    'Batch conversion processing',
+    'Offline PWA functionality',
+    '12+ conversion categories',
+    'Sub-1.5s loading speed'
+  ]
+}
+
+export default function HomePage() {
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      
+      <main className="min-h-screen">
+        {/* Hero Section - Critical Above-the-fold */}
+        <section className="bg-gradient-to-br from-blue-600 to-blue-800 py-16 text-center">
+          <div className="max-w-4xl mx-auto px-4 py-8">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 text-white">
+              Lightning Fast Unit Converter
+            </h1>
+            <p className="text-xl md:text-2xl mb-8 text-gray-100">
+              Convert units instantly with AI suggestions and voice input
+            </p>
+            
+            {/* Critical converter interface */}
+            <div className="bg-white rounded-xl shadow-2xl p-6 max-w-2xl mx-auto">
+              <Suspense fallback={<div className="h-64 bg-gray-100 animate-pulse rounded" />}>
+                <UnitConverter />
+              </Suspense>
+            </div>
+          </div>
+        </section>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
+        {/* Features Section */}
+        <section className="py-16 bg-gray-50">
+          <div className="max-w-4xl mx-auto px-4 py-8">
+            <h2 className="text-3xl font-bold text-center mb-12">
+              Why Choose QuickConvert?
+            </h2>
+            <div className="grid md:grid-cols-3 gap-8">
+              <FeatureCard
+                title="⚡ Lightning Fast"
+                description="Sub-1.5s loading time, 2x faster than competitors"
+              />
+              <FeatureCard
+                title="🤖 AI-Powered"
+                description="Smart suggestions based on context and usage patterns"
+              />
+              <FeatureCard
+                title="🎤 Voice Input"
+                description="Convert units hands-free with voice commands"
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* Voice Input Section - Client Component */}
+        <section className="py-16">
+          <div className="max-w-4xl mx-auto px-4 py-8 text-center">
+            <h2 className="text-3xl font-bold mb-8">Try Voice Conversion</h2>
+            <Suspense fallback={<div className="h-32 bg-gray-100 animate-pulse rounded" />}>
+              <ClientVoiceInput />
+            </Suspense>
+          </div>
+        </section>
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+    </>
+  )
+}
+
+function FeatureCard({ title, description }: { title: string; description: string }) {
+  return (
+    <div className="text-center p-6 bg-white rounded-lg shadow-md">
+      <h3 className="text-xl font-semibold mb-4">{title}</h3>
+      <p className="text-gray-600">{description}</p>
     </div>
-  );
+  )
 }
