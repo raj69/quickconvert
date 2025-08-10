@@ -9,7 +9,9 @@
     "analyze": "ANALYZE=true next build",
     "lighthouse": "lighthouse http://localhost:3000 --output=json --output-path=./lighthouse-report.json",
     "perf-test": "npm run build && npm run lighthouse",
-    "export": "next build && next export"
+    "export": "next build && next export",
+    "release": "git checkout main && git pull origin main && git merge develop && git push origin main",
+    "deploy": "npm run build && git add . && git commit -m 'build: update build files' && git push"
   },
   "dependencies": {
     "@headlessui/react": "^2.0.0",
